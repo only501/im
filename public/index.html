@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>im即时聊天</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+
+        <div class="top" id='chat'>
+    
+        </div>
+    
+        <div class="bottom">
+          <input type="text" id='msg'>
+          <input type="button" value="发送" id='btn'>
+        </div>
+     </div>
+     <script src="./socket.io.js"></script>
+     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+     <script>
+    //创建一个socket连接；
+    var socket = io('http://localhost:9000');
+    var count = 0;
+    $('#btn').click(function(){
+         // 第一步发消息至服务端
+        var msg = $('#msg').val();
+        socket.emit('msg-from-client',msg);
+        $('#msg').val('');
+    });
+    // 第二步客服端接受服务端的信息,并渲染到chat；
+    socket.on('msg-from-server',function(data){
+        console.log(data);
+        count++;
+        $('#chat').append("<div class='row'>"+data+"</div>");
+        $('#chat').scrollTop(count*35)
+    });
+    // 监听enter事件；
+    $('#msg').keypress(function(e){
+        if(e.which == 13){
+            var msg = $('#msg').val();
+             socket.emit('msg-from-client',msg);
+             $('#msg').val('')
+        }
+    })
+     </script>
+</body>
+</html>
